@@ -39,11 +39,23 @@ public class AccountService
 
     public User Register(string fullName, string email, string password, string? avatarUrl)
     {
-        var hashAlgorithm = PasswordHashAlgorithm.Create();
-        var salt = hashAlgorithm.GenerateSalt();
-        var hash = hashAlgorithm.HashPassword(password, salt);
-        var user = _userRepository.Create(fullName, email, avatarUrl);
-        _passwordHashRepository.Create(user.Id, hash, salt, hashAlgorithm.GetName());
-        return user;
+        try
+        {
+            var hashAlgorithm = PasswordHashAlgorithm.Create();
+            var salt = hashAlgorithm.GenerateSalt();
+            var hash = hashAlgorithm.HashPassword(password, salt);
+            var user = _userRepository.Create(fullName, email, avatarUrl);
+            _passwordHashRepository.Create(user.Id, hash, salt, hashAlgorithm.GetName());
+            return user;
+        }
+        catch (Exception e)
+        {
+            if (e.Message.Contains("UNIQUE constraint failed: users.email"))
+            {
+                _logger.LogError("Registrations error: {message}", e);
+                throw new Exception("Email already in use. Please reset password or use another email");
+            }
+        }
+        return null;
     }
 }
