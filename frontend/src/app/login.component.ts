@@ -5,6 +5,8 @@ import { environment } from "src/environments/environment";
 import { firstValueFrom } from "rxjs";
 import { ResponseDto } from "src/models";
 import { ToastController } from "@ionic/angular";
+import { TokenService } from "../TokenService";
+import { Router } from "@angular/router";
 
 @Component({
   template: `
@@ -46,16 +48,19 @@ export class LoginComponent {
     password: [null, Validators.required],
   });
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private toast: ToastController ) { }
+  constructor(private fb: FormBuilder, private http: HttpClient, private toast: ToastController,
+              private tokenService: TokenService, private router: Router) { }
 
   async submit() {
     const url = '/api/account/login';
-    var response = await firstValueFrom(this.http.post<ResponseDto<any>>(url, this.form.value));
+    var response = await firstValueFrom(this.http.post<ResponseDto<{token: string}>>(url, this.form.value));
+    this.tokenService.setToken(response.responseData!.token);
 
     (await this.toast.create({
       message: response.messageToClient,
       color: "success",
       duration: 5000
     })).present();
+
   }
 }

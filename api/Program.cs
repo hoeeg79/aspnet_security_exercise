@@ -19,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var frontEndRelativePath = "./../frontend/www";
 builder.Services.AddSpaStaticFiles(conf => conf.RootPath = frontEndRelativePath);
+builder.Services.AddJwtService();
+builder.Services.AddSwaggerGenWithBearerJWT();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,5 +36,6 @@ app.UseSpaStaticFiles();
 app.UseSpa(conf => { conf.Options.SourcePath = frontEndRelativePath; });
 
 app.MapControllers();
+app.UseMiddleware<JwtBearerHandler>();
 app.UseMiddleware<GlobalExceptionHandler>();
 app.Run();

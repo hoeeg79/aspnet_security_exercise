@@ -12,6 +12,8 @@ import { UsersComponent } from './users.component';
 import { RegisterComponent } from './register.component';
 import { LoginComponent } from './login.component';
 import { ErrorHttpInterceptor } from 'src/interceptors/error-http-interceptors';
+import { AuthHttpInterceptor } from "../interceptors/auth-http-interceptor";
+import {TokenService} from "../TokenService"
 
 @NgModule({
   declarations: [
@@ -28,7 +30,8 @@ import { ErrorHttpInterceptor } from 'src/interceptors/error-http-interceptors';
     ReactiveFormsModule
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorHttpInterceptor, multi: true },],
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorHttpInterceptor, multi: true },
+    TokenService, AuthHttpInterceptor],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
