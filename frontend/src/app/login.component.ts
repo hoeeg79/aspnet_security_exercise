@@ -57,5 +57,6 @@ export class LoginComponent {
       color: "success",
       duration: 5000
     })).present();
+    window.location.replace("http://localhost:4200/users")
   }
 }

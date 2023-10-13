@@ -18,10 +18,10 @@ public class UserRepository
 INSERT INTO users (full_name, email, avatar_url)
 VALUES (@fullName, @email, @avatarUrl)
 RETURNING
-    id as {{nameof(User.Id)}},
-    full_name as {{nameof(User.FullName)}},
-    email as {{nameof(User.Email)}},
-    avatar_url as {{nameof(User.AvatarUrl)}},
+    id as {nameof(User.Id)},
+    full_name as {nameof(User.FullName)},
+    email as {nameof(User.Email)},
+    avatar_url as {nameof(User.AvatarUrl)};
 ";
         using var connection = _dataSource.OpenConnection();
         return connection.QueryFirst<User>(sql, new { fullName, email, avatarUrl });
@@ -31,11 +31,11 @@ RETURNING
     {
         const string sql = $@"
 SELECT
-    id as {{nameof(User.Id)}},
-    full_name as {{nameof(User.FullName)}},
-    email as {{nameof(User.Email)}},
-    avatar_url as {{nameof(User.AvatarUrl)}},
-    role as {{nameof(User.Role)}}
+    id as {nameof(User.Id)},
+    full_name as {nameof(User.FullName)},
+    email as {nameof(User.Email)},
+    avatar_url as {nameof(User.AvatarUrl)},
+    role as {nameof(User.Role)}
 FROM users
 WHERE id = @id;
 ";
@@ -47,11 +47,11 @@ WHERE id = @id;
     {
         const string sql = $@"
 SELECT
-    id as {{nameof(User.Id)}},
-    full_name as {{nameof(User.FullName)}},
-    email as {{nameof(User.Email)}},
-    avatar_url as {{nameof(User.AvatarUrl)}},
-    role as {{nameof(User.Role)}}
+    id as {nameof(User.Id)},
+    full_name as {nameof(User.FullName)},
+    email as {nameof(User.Email)},
+    avatar_url as {nameof(User.AvatarUrl)},
+    role as {nameof(User.Role)}
 FROM users
 ";
         using var connection = _dataSource.OpenConnection();

@@ -20,10 +20,19 @@ public class AccountController : ControllerBase
     public ResponseDto Login([FromBody] LoginDto dto)
     {
         var user = _service.Authenticate(dto.Email, dto.Password);
+        HttpContext.SetSessionData(SessionData.FromUser(user));
         return new ResponseDto
         {
             MessageToClient = "Successfully authenticated"
         };
+    }
+
+    [HttpPost]
+    [Route("/api/account/logout")]
+    public ResponseDto Logout()
+    {
+        HttpContext.Session.Clear();
+        return null;
     }
 
     [HttpPost]

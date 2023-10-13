@@ -13,6 +13,16 @@ builder.Services.AddSingleton<PasswordHashRepository>();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<AccountService>();
 
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(4);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +40,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseSecurityHeaders();
 
+app.UseSession();
 app.UseSpaStaticFiles();
 app.UseSpa(conf => { conf.Options.SourcePath = frontEndRelativePath; });
 

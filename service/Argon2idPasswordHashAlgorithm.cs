@@ -23,6 +23,7 @@ public class Argon2idPasswordHashAlgorithm : PasswordHashAlgorithm
 
     public override bool VerifyHashedPassword(string password, string hash, string salt)
     {
-        return HashPassword(password, salt).SequenceEqual(hash);
+        var dbHash = HashPassword(password, salt);
+           return dbHash.SequenceEqual(hash);
     }
 }
