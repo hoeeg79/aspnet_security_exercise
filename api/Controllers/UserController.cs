@@ -1,3 +1,4 @@
+using api.Filters;
 using api.TransferModels;
 using Microsoft.AspNetCore.Mvc;
 using service;
@@ -13,6 +14,7 @@ public class UserController : ControllerBase
         _service = service;
     }
 
+    [RequireAuthentication]
     [HttpGet("/api/users")]
     public ResponseDto Get()
     {
