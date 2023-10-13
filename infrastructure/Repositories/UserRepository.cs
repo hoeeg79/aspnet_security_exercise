@@ -31,10 +31,11 @@ RETURNING
     {
         const string sql = $@"
 SELECT
-    id as {nameof(User.Id)},
-    full_name as {nameof(User.FullName)},
-    email as {nameof(User.Email)},
-    avatar_url as {nameof(User.AvatarUrl)}
+    id as {{nameof(User.Id)}},
+    full_name as {{nameof(User.FullName)}},
+    email as {{nameof(User.Email)}},
+    avatar_url as {{nameof(User.AvatarUrl)}},
+    role as {{nameof(User.Role)}}
 FROM users
 WHERE id = @id;
 ";
@@ -46,10 +47,11 @@ WHERE id = @id;
     {
         const string sql = $@"
 SELECT
-    id as {nameof(User.Id)},
-    full_name as {nameof(User.FullName)},
-    email as {nameof(User.Email)},
-    avatar_url as {nameof(User.AvatarUrl)}
+    id as {{nameof(User.Id)}},
+    full_name as {{nameof(User.FullName)}},
+    email as {{nameof(User.Email)}},
+    avatar_url as {{nameof(User.AvatarUrl)}},
+    role as {{nameof(User.Role)}}
 FROM users
 ";
         using var connection = _dataSource.OpenConnection();

@@ -58,4 +58,9 @@ public class AccountService
         }
         return null;
     }
+    
+    public User? Get(SessionData data)
+    {
+        return _userRepository.GetById(data.UserId);
+    }
 }
