@@ -31,7 +31,7 @@ import {TokenService} from "../TokenService"
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorHttpInterceptor, multi: true },
-    TokenService, AuthHttpInterceptor],
+    TokenService, {provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true}],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
