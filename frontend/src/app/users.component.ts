@@ -5,6 +5,7 @@ import {firstValueFrom} from "rxjs";
 import { State } from "src/state";
 import { environment } from "src/environments/environment";
 import { ResponseDto, User } from "src/models";
+import { Router } from "@angular/router";
 
 @Component({
   template: `
@@ -29,7 +30,8 @@ export class UsersComponent implements OnInit {
   constructor(
     public state: State,
     private http: HttpClient,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private router: Router
   ) {
 
   }
@@ -49,7 +51,7 @@ export class UsersComponent implements OnInit {
       duration: 5000,
       color: 'success',
     })).present()
-    window.location.replace("http://localhost:4200/login")
+    this.router.navigateByUrl("/login")
   }
 }
 
