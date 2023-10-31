@@ -14,6 +14,7 @@ import { Post, PostsFeedService } from "./posts-feed.service";
                           <ion-card-header>
                               <ion-card-title>{{post.title}}</ion-card-title>
                           </ion-card-header>
+                          <ion-card-subtitle *ngIf=""></ion-card-subtitle>
                           <ion-card-content>
                               {{post.content}}
                           </ion-card-content>
@@ -35,4 +36,6 @@ export class PostsFeedComponent implements OnInit {
     ngOnInit(): void {
         this.posts$ = this.service.getPosts();
     }
+
+
 }
