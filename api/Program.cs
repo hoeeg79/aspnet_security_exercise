@@ -1,6 +1,7 @@
 using api;
 using api.Middleware;
 using infrastructure.Repositories;
+using Microsoft.AspNetCore.HttpOverrides;
 using service;
 using service.Services;
 
@@ -24,9 +25,18 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var frontEndRelativePath = "./../frontend/www";
+var frontEndRelativePath = builder.Environment.IsDevelopment() ? "./../frontend/www" : "../blog_frontend";
 builder.Services.AddSpaStaticFiles(conf => conf.RootPath = frontEndRelativePath);
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
 var app = builder.Build();
+xU2VDGWoAhRZ89Imp4YSJbhnGvv5jf7vA5I278sFF4fb5JMwT2L2SC9UGfF/BlpnnixeUabYnwx3ahafVNzHuw==
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
