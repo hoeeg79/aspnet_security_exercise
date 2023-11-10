@@ -14,11 +14,13 @@ public class AccountController : ControllerBase
 {
     private readonly AccountService _service;
     private readonly JwtService _jwtService;
+    private readonly BlobService _blobService;
 
-    public AccountController(AccountService service, JwtService jwtService)
+    public AccountController(AccountService service, JwtService jwtService, BlobService blobService)
     {
         _service = service;
         _jwtService = jwtService;
+        _blobService = blobService;
     }
 
     [HttpPost]
@@ -58,13 +60,13 @@ public class AccountController : ControllerBase
         string? avatarUrl = null;
         if (avatar != null)
         {
-            avatarUrl = this._accountService.Get(session)?.AvatarUrl;
+            avatarUrl = this._service.Get(session)?.AvatarUrl;
             // We need a stream of bytes (image data)
             using var avatarStream = avatar.OpenReadStream();
             // "avatar" is the container name
             avatarUrl = _blobService.Save("avatar", avatarStream, avatarUrl);
         }
-        _accountService.Update(session, model, avatarUrl);
+        _service.Update(session, model, avatarUrl);
         return Ok();
     }
 }

@@ -9,7 +9,7 @@ import {HttpEventType} from "@angular/common/http";
     <app-title title="Account"></app-title>
     <ion-content>
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <ion-list class="field-list" *ngIf="loading; else loadingSpinner">
+        <ion-list class="field-list" *ngIf="loading; else loading">
           <ion-item>
             <ion-input label="Name" formControlName="fullName"></ion-input>
           </ion-item>
@@ -31,7 +31,7 @@ import {HttpEventType} from "@angular/common/http";
         <ion-progress-bar *ngIf="uploading" [value]="uploadProgress"></ion-progress-bar>
         <ion-button *ngIf="form.valid && !uploading" (click)="submit()">Update</ion-button>
       </form>
-      <ng-template #loadingSpinner>
+      <ng-template #loading>
         <ion-spinner></ion-spinner>
       </ng-template>
     </ion-content>
@@ -39,23 +39,22 @@ import {HttpEventType} from "@angular/common/http";
   styleUrls: ['./form.css'],
 })
 export class AccountComponent implements OnInit {
-  account$?: Observable<User>;
+  loading: boolean = true;
+  uploading: boolean = false;
+  uploadProgress: number | null = null;
 
   form = this.fb.group({
     fullName: ['', Validators.required],
     email: ['', Validators.required],
     avatar: [null as File | null],
   });
-
   avatarUrl: string | ArrayBuffer | null = null;
   isAdmin?: boolean;
-  loading: boolean = true;
-  uploading: boolean = false;
-  uploadProgress: number | null = null;
 
   constructor(
+    private readonly fb: FormBuilder,
     private readonly service: AccountService,
-    private readonly fb: FormBuilder) {
+  ) {
   }
 
   async ngOnInit() {
@@ -67,14 +66,10 @@ export class AccountComponent implements OnInit {
   }
 
   onFileChanged($event: Event) {
-    // The event contains all/any selected files
     const files = ($event.target as HTMLInputElement).files;
     if (!files) return;
-    // Set the form field to first file
     this.form.patchValue({avatar: files[0]});
-    // This would update the validation of the form field, if we had any validators
     this.form.controls.avatar.updateValueAndValidity();
-    // In order to make a preview of the avatar in ion-img we need to convert it to a data URL
     const reader = new FileReader();
     reader.readAsDataURL(files[0]);
     reader.onload = () => {
