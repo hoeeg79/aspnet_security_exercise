@@ -97,4 +97,18 @@ public static class ServiceCollectionExtensions
             }
         );
     }
+    
+    public static void AddAvatarBlobService(this IServiceCollection services)
+    {
+        services.AddSingleton<BlobService>(provider =>
+        {
+            // Get connection string from configuration (appsettings.json)
+            var connectionString = provider.GetService<IConfiguration>()!
+                .GetConnectionString("AvatarStorage");
+            // The client knows how to talk to the service on Azure.
+            var client = new BlobServiceClient(connectionString);
+            // Return an instance of the service we just made.
+            return new BlobService(client);
+        });
+    }
 }

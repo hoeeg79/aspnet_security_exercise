@@ -48,4 +48,23 @@ public class AccountController : ControllerBase
         var user = _service.Get(data);
         return Ok(user);
     }
+    
+    [RequireAuthentication]
+    [HttpPut]
+    [Route("/api/account/update")]
+    public IActionResult Update([FromForm] UpdateAccountCommandModel model, IFormFile? avatar)
+    {
+        var session = HttpContext.GetSessionData()!;
+        string? avatarUrl = null;
+        if (avatar != null)
+        {
+            avatarUrl = this._accountService.Get(session)?.AvatarUrl;
+            // We need a stream of bytes (image data)
+            using var avatarStream = avatar.OpenReadStream();
+            // "avatar" is the container name
+            avatarUrl = _blobService.Save("avatar", avatarStream, avatarUrl);
+        }
+        _accountService.Update(session, model, avatarUrl);
+        return Ok();
+    }
 }

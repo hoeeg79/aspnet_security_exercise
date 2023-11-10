@@ -1,33 +1,37 @@
 import { Component, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
-import { AccountService, User } from "./account.service";
+import {finalize, firstValueFrom, Observable} from "rxjs";
+import {AccountService, AccountUpdate, User} from "./account.service";
+import {FormBuilder, Validators} from "@angular/forms";
+import {HttpEventType} from "@angular/common/http";
 
 @Component({
   template: `
     <app-title title="Account"></app-title>
     <ion-content>
-      <form>
-        <ion-list class="field-list" *ngIf="account$ | async as account; else loading">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <ion-list class="field-list" *ngIf="loading; else loadingSpinner">
           <ion-item>
-            <ion-input label="Name" [value]="account.fullName"></ion-input>
+            <ion-input label="Name" formControlName="fullName"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-input label="Email" [value]="account.email"></ion-input>
+            <ion-input label="Email" formControlName="email"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-img [src]="account.avatarUrl"></ion-img>
-            <ion-input label="Avatar URL" [value]="account.avatarUrl" [readonly]="true"></ion-input>
+            <ion-img [src]="avatarUrl"></ion-img>
+            <ion-input type="file" label="Avatar" formControlName="avatar" accept="image/png, image/jpeg"
+                       (change)="onFileChanged($event)"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-toggle [checked]="account.isAdmin">Administrator</ion-toggle>
+            <ion-toggle disabled [checked]="isAdmin">Administrator</ion-toggle>
           </ion-item>
         </ion-list>
-        <ion-button>Update</ion-button>
+        <ion-progress-bar *ngIf="uploading" [value]="uploadProgress"></ion-progress-bar>
+        <ion-button *ngIf="form.valid && !uploading" (click)="submit()">Update</ion-button>
       </form>
-      <ng-template #loading>
+      <ng-template #loadingSpinner>
         <ion-spinner></ion-spinner>
       </ng-template>
     </ion-content>
@@ -37,9 +41,62 @@ import { AccountService, User } from "./account.service";
 export class AccountComponent implements OnInit {
   account$?: Observable<User>;
 
-  constructor(private readonly service: AccountService) { }
+  form = this.fb.group({
+    fullName: ['', Validators.required],
+    email: ['', Validators.required],
+    avatar: [null as File | null],
+  });
 
-  ngOnInit(): void {
-    this.account$ = this.service.getCurrentUser();
+  avatarUrl: string | ArrayBuffer | null = null;
+  isAdmin?: boolean;
+  loading: boolean = true;
+  uploading: boolean = false;
+  uploadProgress: number | null = null;
+
+  constructor(
+    private readonly service: AccountService,
+    private readonly fb: FormBuilder) {
+  }
+
+  async ngOnInit() {
+    var account = await firstValueFrom(this.service.getCurrentUser());
+    this.form.patchValue(account);
+    this.avatarUrl = account.avatarUrl;
+    this.isAdmin = account.isAdmin;
+    this.loading = false;
+  }
+
+  onFileChanged($event: Event) {
+    // The event contains all/any selected files
+    const files = ($event.target as HTMLInputElement).files;
+    if (!files) return;
+    // Set the form field to first file
+    this.form.patchValue({avatar: files[0]});
+    // This would update the validation of the form field, if we had any validators
+    this.form.controls.avatar.updateValueAndValidity();
+    // In order to make a preview of the avatar in ion-img we need to convert it to a data URL
+    const reader = new FileReader();
+    reader.readAsDataURL(files[0]);
+    reader.onload = () => {
+      this.avatarUrl = reader.result;
+    }
+  }
+
+  submit() {
+    if (this.form.invalid) return;
+    this.uploading = true;
+    this.service.update(this.form.value as AccountUpdate)
+      .pipe(finalize(() => {
+        this.uploading = false;
+        this.uploadProgress = null;
+      }))
+      .subscribe(event => {
+        if (event.type == HttpEventType.UploadProgress) {
+          this.uploadProgress = Math.round(100 * (event.loaded / (event.total ?? 1)))
+        } else if (event.type == HttpEventType.Response && event.body) {
+          this.form.patchValue(event.body);
+        }
+      });
   }
 }
+

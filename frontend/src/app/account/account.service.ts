@@ -21,6 +21,12 @@ export interface Registration {
     avatarUrl: string | null,
 }
 
+export interface AccountUpdate {
+  fullName: string;
+  email: string;
+  avatar: File | null;
+}
+
 @Injectable()
 export class AccountService {
     constructor(private readonly http: HttpClient) { }
@@ -36,4 +42,15 @@ export class AccountService {
     register(value: Registration) {
         return this.http.post<any>('/api/account/register', value);
     }
+
+  update(value: AccountUpdate) {
+    const formData = new FormData();
+    Object.entries(value).forEach(([key, value]) =>
+      formData.append(key, value)
+    );
+    return this.http.put<User>('/api/account/update', formData, {
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
 }
